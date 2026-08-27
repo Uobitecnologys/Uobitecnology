@@ -1,90 +1,246 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UOBI technology | Portfolio</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+
+        /* Modern White + Indigo/Violet Mesh Background */
+        .bg-pattern {
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.12) 0px, transparent 40%),
+                radial-gradient(at 90% 20%, rgba(168, 85, 247, 0.10) 0px, transparent 40%),
+                radial-gradient(at 50% 80%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(241, 245, 249, 0.8) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        /* Minimal Grid Overlay */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+        }
+
+        /* Floating Light Orbs */
+        @keyframes floatOrb {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-25px) scale(1.08); }
+        }
+
+        .orb-1 {
+            animation: floatOrb 8s ease-in-out infinite;
+        }
+        .orb-2 {
+            animation: floatOrb 10s ease-in-out infinite 2s;
+        }
+
+        /* Entrance Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.2); }
+            50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .animate-delay-1 { animation-delay: 0.15s; }
+        .animate-delay-2 { animation-delay: 0.3s; }
+        .animate-delay-3 { animation-delay: 0.45s; }
+
+        .pulse-badge {
+            animation: pulseGlow 2.5s infinite;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex items-center justify-center p-4">
+<body class="bg-pattern bg-grid text-slate-800 antialiased selection:bg-indigo-600 selection:text-white relative overflow-x-hidden">
 
-    <div class="max-w-2xl w-full bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700">
+    <!-- Ambient Gradient Glows -->
+    <div class="fixed top-10 left-1/4 w-96 h-96 bg-indigo-200/40 rounded-full blur-3xl pointer-events-none orb-1 -z-10"></div>
+    <div class="fixed bottom-10 right-1/4 w-[30rem] h-[30rem] bg-purple-200/40 rounded-full blur-3xl pointer-events-none orb-2 -z-10"></div>
 
-        <!-- Header Section -->
-        <div class="bg-gradient-to-r from-cyan-500 to-blue-600 p-8 text-center">
-            <h1 class="text-4xl font-extrabold tracking-tight text-white mb-2">UOBI technology</h1>
-            <p class="text-cyan-100 text-lg font-medium">Developer, Music Producer, Editor, Graphic Designer & Cybersecurity</p>
+    <!-- Navbar -->
+    <header class="fixed top-0 left-0 w-full bg-white/70 backdrop-blur-md border-b border-indigo-100/80 z-50 transition-all duration-300">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+            <span class="text-xl font-extrabold tracking-tight text-slate-900 uppercase hover:scale-105 transition-transform cursor-pointer">
+                UOBI<span class="text-indigo-600 font-normal">tech</span>
+            </span>
+            <nav class="flex gap-6 text-sm font-medium text-slate-600">
+                <a href="#brand" class="hover:text-indigo-600 hover:-translate-y-0.5 transition-all">Overview</a>
+                <a href="#about" class="hover:text-indigo-600 hover:-translate-y-0.5 transition-all">About</a>
+                <a href="#skills" class="hover:text-indigo-600 hover:-translate-y-0.5 transition-all">Skills</a>
+                <a href="#work" class="hover:text-indigo-600 hover:-translate-y-0.5 transition-all">Work</a>
+                <a href="#contact" class="hover:text-indigo-600 hover:-translate-y-0.5 transition-all">Contact</a>
+            </nav>
         </div>
+    </header>
 
-        <div class="p-8 space-y-6">
+    <main class="max-w-5xl mx-auto px-6 pt-32 pb-20 space-y-24">
 
-            <!-- About Section -->
-            <div>
-                <h2 class="text-xl font-bold text-cyan-400 mb-2 border-b border-slate-700 pb-1">About Me</h2>
-                <p class="text-slate-300 leading-relaxed">Passionate developer building Python applications, security tools, and hardware projects.</p>
-            </div>
+        <!-- Hero / Intro -->
+        <section class="space-y-4 animate-fade-in-up">
+            <span class="pulse-badge inline-flex items-center gap-2 px-3.5 py-1 bg-white/90 backdrop-blur-sm text-indigo-900 font-mono text-xs rounded-full border border-indigo-200 uppercase tracking-widest shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+                Software Developer & Cybersecurity Specialist
+            </span>
+            <h1 class="text-5xl sm:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+                UOBI technology
+            </h1>
+            <p class="text-xl text-slate-600 font-light max-w-2xl leading-relaxed">
+                Specialized in Multi-Language Software Development, Advanced Cybersecurity Solutions & Network Security.
+            </p>
+        </section>
 
-            <!-- Skills Section -->
-            <div>
-                <h2 class="text-xl font-bold text-cyan-400 mb-3 border-b border-slate-700 pb-1">Skills & Interests</h2>
-                <div class="flex flex-wrap gap-2">
-                    <span class="bg-slate-700 text-cyan-300 text-sm font-medium px-3 py-1 rounded-full border border-slate-600">Programmer</span>
-                    <span class="bg-slate-700 text-cyan-300 text-sm font-medium px-3 py-1 rounded-full border border-slate-600">Network & Cybersecurity Tools</span>
-                    <span class="bg-slate-700 text-cyan-300 text-sm font-medium px-3 py-1 rounded-full border border-slate-600">Single worker</span>
-                    <span class="bg-slate-700 text-cyan-300 text-sm font-medium px-3 py-1 rounded-full border border-slate-600">Hardware Projects & Robotics</span>
-                    <span class="bg-slate-700 text-cyan-300 text-sm font-medium px-3 py-1 rounded-full border border-slate-600">Web Development</span>
+        <!-- Brand Identity Section: What is UOBI Technology -->
+        <section id="brand" class="scroll-mt-24 space-y-6 border-t border-indigo-100/80 pt-12 animate-fade-in-up">
+            <div class="bg-gradient-to-br from-white/90 via-slate-50/80 to-indigo-50/60 backdrop-blur-md border border-indigo-100/80 p-8 sm:p-12 rounded-3xl shadow-xl shadow-indigo-500/5 relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 text-indigo-100/40 font-black text-9xl select-none pointer-events-none tracking-tighter">
+                    UOBI
+                </div>
+                
+                <div class="relative z-10 space-y-4">
+                    <span class="text-xs font-mono uppercase tracking-widest text-indigo-600 font-semibold">Brand Identity</span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        What is UOBI technology?
+                    </h2>
+                    
+                    <p class="text-slate-700 text-lg sm:text-xl font-medium leading-relaxed max-w-3xl">
+                        UOBI technology is a brand that helps solve real-world problems in cybersecurity, software programming across multiple languages, system architecture, and hardware integration.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 text-slate-600 text-sm leading-relaxed">
+                        <div class="bg-white/80 p-5 rounded-2xl border border-indigo-100 shadow-sm hover:border-indigo-300 transition-colors">
+                            <h4 class="font-bold text-indigo-950 text-base mb-1">🛡️ Cybersecurity & Threat Defense</h4>
+                            <p>Architecting custom vulnerability scanners, automated security tools, and analytical platforms to solve real-world digital security challenges.</p>
+                        </div>
+                        <div class="bg-white/80 p-5 rounded-2xl border border-indigo-100 shadow-sm hover:border-indigo-300 transition-colors">
+                            <h4 class="font-bold text-indigo-950 text-base mb-1">💻 Multi-Language Software Engineering</h4>
+                            <p>Building high-performance applications, custom simulated operating systems, and developer tools written across modern programming paradigms.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Projects Section -->
-            <div>
-                <h2 class="text-xl font-bold text-cyan-400 mb-3 border-b border-slate-700 pb-1">Featured Work</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
-                        <h3 class="font-semibold text-white mb-1">Website's Bug Founder</h3>
-                        <p class="text-xs text-slate-400">Built a custom Bug founder using Python.</p>
-                    </div>
-                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
-                        <h3 class="font-semibold text-white mb-1">Simulated os</h3>
-                        <p class="text-xs text-slate-400">Create a custom simulated os fir learners</p>
-                    </div>
-                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/60">
-                        <h3 class="font-semibold text-white mb-1">Tool Box</h3>
-                        <p class="text-xs text-slate-400">Create A neo Tool box for help learners (terminal and gui mode)</p>
-                    </div>
+        <!-- About Us Section -->
+        <section id="about" class="scroll-mt-24 space-y-6 border-t border-indigo-100/80 pt-12 animate-fade-in-up animate-delay-1">
+            <div class="flex flex-col md:flex-row gap-8 justify-between items-start">
+                <div class="md:w-1/3">
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">About Us</h2>
+                    <p class="text-sm text-indigo-600 font-medium mt-1">Background & Core Focus</p>
+                </div>
+                <div class="md:w-2/3 space-y-4 text-slate-600 leading-relaxed text-lg">
+                    <p>
+                        Welcome to <strong class="text-slate-900">UOBI technology</strong>. Driven by innovation, I specialize in engineering robust software applications, advanced security systems, and custom hardware integrations.
+                    </p>
+                    <p class="text-base text-slate-500">
+                        Whether it’s developing simulated environments for education or crafting high-performance security toolboxes, every project is built with precision, scalability, and modern efficiency.
+                    </p>
                 </div>
             </div>
+        </section>
 
-            <!-- Additional / Important Info Section -->
-            <div class="border-t border-slate-700 pt-4">
-                <h2 class="text-xl font-bold text-cyan-400 mb-3 border-b border-slate-700 pb-1">Info</h2>
-                <ul class="space-y-2 text-slate-300 text-sm">
-                    <li class="flex items-center gap-2">
-                        <strong class="text-white">👤 Developer:</strong> Ubaid ur rehman
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <strong class="text-white">📧 Email:</strong> ubaidurrehman00987@gmail.com
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <strong class="text-white">🎓 Education:</strong> Still Learning
-                    </li>
-                    <li class="flex items-center gap-2 flex-wrap">
-                        <strong class="text-white">🎯 Hobbies:</strong>
-                        <span class="bg-slate-700 text-xs px-2 py-1 rounded text-cyan-200 border border-slate-600">Not much :(</span>
-                    </li>
-                </ul>
+        <!-- Skills Section -->
+        <section id="skills" class="scroll-mt-24 space-y-6 border-t border-indigo-100/80 pt-12 animate-fade-in-up animate-delay-2">
+            <div class="flex flex-col md:flex-row gap-8 justify-between items-start">
+                <div class="md:w-1/3">
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Skills & Capabilities</h2>
+                    <p class="text-sm text-indigo-600 font-medium mt-1">Technical Stack & Expertise</p>
+                </div>
+                <div class="md:w-2/3 flex flex-wrap gap-3">
+                    <span class="px-4 py-2 bg-white/90 backdrop-blur-sm text-slate-800 text-sm font-semibold rounded-xl border border-indigo-100 shadow-sm hover:border-indigo-600 hover:text-indigo-600 hover:-translate-y-1 hover:shadow-md transition-all cursor-default">Full-Stack Programming & Development</span>
+                    <span class="px-4 py-2 bg-white/90 backdrop-blur-sm text-slate-800 text-sm font-semibold rounded-xl border border-indigo-100 shadow-sm hover:border-indigo-600 hover:text-indigo-600 hover:-translate-y-1 hover:shadow-md transition-all cursor-default">Network & Cybersecurity Tools</span>
+                    <span class="px-4 py-2 bg-white/90 backdrop-blur-sm text-slate-800 text-sm font-semibold rounded-xl border border-indigo-100 shadow-sm hover:border-indigo-600 hover:text-indigo-600 hover:-translate-y-1 hover:shadow-md transition-all cursor-default">Independent Software Engineering</span>
+                    <span class="px-4 py-2 bg-white/90 backdrop-blur-sm text-slate-800 text-sm font-semibold rounded-xl border border-indigo-100 shadow-sm hover:border-indigo-600 hover:text-indigo-600 hover:-translate-y-1 hover:shadow-md transition-all cursor-default">Hardware Projects & Robotics</span>
+                    <span class="px-4 py-2 bg-white/90 backdrop-blur-sm text-slate-800 text-sm font-semibold rounded-xl border border-indigo-100 shadow-sm hover:border-indigo-600 hover:text-indigo-600 hover:-translate-y-1 hover:shadow-md transition-all cursor-default">Modern Web Development</span>
+                </div>
             </div>
+        </section>
 
-            <!-- Footer / Links -->
-            <div class="pt-4 border-t border-slate-700 text-center flex justify-center gap-4">
-                <a href="https://github.com/Uobitecnologys" target="_blank" class="text-slate-400 hover:text-cyan-400 transition">GitHub</a>
-                <span class="text-slate-600">•</span>
-                <a href="https://www.instagram.com/uobi.technology?igsi=cjVnb3hvMGRhd24w" target="_blank" class="text-slate-400 hover:text-cyan-400 transition">Instagram</a>
+        <!-- Featured Work Section -->
+        <section id="work" class="scroll-mt-24 space-y-6 border-t border-indigo-100/80 pt-12 animate-fade-in-up animate-delay-3">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Featured Work</h2>
+                <p class="text-sm text-indigo-600 font-medium mt-1">Key Projects & Applications</p>
             </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-white/90 backdrop-blur-sm p-6 rounded-2xl border border-indigo-100 shadow-sm hover:shadow-xl hover:border-indigo-600 hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
+                    <span class="text-xs font-mono text-indigo-500 font-semibold group-hover:text-indigo-700 transition-colors">01 / Cybersecurity</span>
+                    <h3 class="font-bold text-slate-900 text-xl mt-3 mb-2 group-hover:translate-x-1 transition-transform">Website Bug Finder</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Built an automated vulnerability scanner engine designed for modern web security audits.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-white/90 backdrop-blur-sm p-6 rounded-2xl border border-indigo-100 shadow-sm hover:shadow-xl hover:border-indigo-600 hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
+                    <span class="text-xs font-mono text-indigo-500 font-semibold group-hover:text-indigo-700 transition-colors">02 / System Architecture</span>
+                    <h3 class="font-bold text-slate-900 text-xl mt-3 mb-2 group-hover:translate-x-1 transition-transform">Simulated OS</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Engineered an interactive custom simulated operating system for computer science concepts.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-white/90 backdrop-blur-sm p-6 rounded-2xl border border-indigo-100 shadow-sm hover:shadow-xl hover:border-indigo-600 hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
+                    <span class="text-xs font-mono text-indigo-500 font-semibold group-hover:text-indigo-700 transition-colors">03 / Utility Suite</span>
+                    <h3 class="font-bold text-slate-900 text-xl mt-3 mb-2 group-hover:translate-x-1 transition-transform">Neo Tool Box</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">Created a dual-mode (Terminal & GUI) multipurpose developer toolbox for daily workflows.</p>
+                </div>
+            </div>
+        </section>
 
+        <!-- Contact Us Section -->
+        <section id="contact" class="scroll-mt-24 border-t border-indigo-100/80 pt-12">
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-8 md:p-12 rounded-3xl shadow-2xl hover:shadow-indigo-500/10 transition-shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border border-indigo-900/50">
+                <div>
+                    <span class="text-xs font-mono uppercase tracking-widest text-indigo-300">Get In Touch</span>
+                    <h2 class="text-3xl font-extrabold text-white tracking-tight mt-1">Contact Us</h2>
+                    <p class="text-indigo-200 text-sm mt-2">Have a project, security inquiry, or engineering idea?</p>
+                </div>
+                <div class="space-y-3 w-full md:w-auto">
+                    <div class="text-slate-300 text-sm">
+                        <span class="block text-xs text-indigo-400 uppercase font-mono">Lead Developer</span>
+                        <span class="font-medium text-white text-base">Ubaid ur rehman</span>
+                    </div>
+                    <a href="mailto:ubaidurrehman00987@gmail.com" class="inline-block w-full md:w-auto text-center px-6 py-3 bg-white text-indigo-950 font-bold rounded-xl hover:bg-indigo-50 active:scale-95 transition-all shadow">
+                        ubaidurrehman00987@gmail.com
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-indigo-100/80 py-8 bg-white/60 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500">
+            <p>© UOBI technology. All rights reserved.</p>
+            <div class="flex gap-6 font-medium text-slate-700">
+                <a href="https://github.com/Uobitecnologys" target="_blank" class="hover:text-indigo-600 hover:scale-110 transition-transform">GitHub</a>
+                <a href="https://www.instagram.com/uobi.technology?igsi=cjVnb3hvMGRhd24w" target="_blank" class="hover:text-indigo-600 hover:scale-110 transition-transform">Instagram</a>
+            </div>
         </div>
-    </div>
+    </footer>
 
 </body>
 </html>
