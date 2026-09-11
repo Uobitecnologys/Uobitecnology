@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uobi Technology | Cybersecurity & Modern Web Solutions</title>
+    
+    <!-- Three.js and OrbitControls via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #030712;
+            color: #f8fafc;
+            overflow-x: hidden;
+            position: relative;
+            text-align: center;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vw;
+            min-height: 100vh;
+            z-index: 0;
+            pointer-events: auto;
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.70);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+        }
+
+        /* ===== Big highlighted section titles (Welcome, Who We Are, etc.) ===== */
+        .title-highlight {
+            font-size: 1.75rem !important;
+            font-weight: 900 !important;
+            letter-spacing: 0.08em;
+            color: #7dd3fc !important;
+            text-shadow: 0 0 22px rgba(56, 189, 248, 0.55), 0 0 45px rgba(99, 102, 241, 0.3);
+        }
+        @media (min-width: 640px) {
+            .title-highlight {
+                font-size: 2.25rem !important;
+            }
+        }
+
+        /* ===== Highlighted small labels (Location, Open-Source, Domain, Capabilities, Connect) ===== */
+        .label-highlight {
+            font-size: 1rem !important;
+            font-weight: 800 !important;
+            color: #7dd3fc !important;
+            letter-spacing: 0.2em;
+            text-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+        }
+
+        .space-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .floating-box {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.05), rgba(99, 102, 241, 0.1));
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            animation: floatAround 24s infinite cubic-bezier(0.37, 0, 0.63, 1);
+        }
+
+        @keyframes floatAround {
+            0% { transform: translateY(110vh) translateX(0) rotate(0deg) scale(0.9); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(-20vh) translateX(60px) rotate(360deg) scale(1.1); opacity: 0; }
+        }
+
+        .box-1 { width: 75px; height: 75px; left: 6%; animation-duration: 22s; animation-delay: 0s; }
+        .box-2 { width: 48px; height: 48px; left: 28%; animation-duration: 28s; animation-delay: 3s; }
+        .box-3 { width: 95px; height: 95px; left: 52%; animation-duration: 25s; animation-delay: 1s; }
+        .box-4 { width: 60px; height: 60px; left: 74%; animation-duration: 19s; animation-delay: 4s; }
+        .box-5 { width: 70px; height: 70px; left: 90%; animation-duration: 30s; animation-delay: 2s; }
+
+        @keyframes textFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .float-text { animation: textFloat 5s ease-in-out infinite; }
+
+        @keyframes glowPulse {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.3)); }
+            50% { filter: drop-shadow(0 0 35px rgba(99, 102, 241, 0.4)); }
+        }
+
+        .big-brand {
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #ffffff 0%, #7dd3fc 25%, #38bdf8 50%, #818cf8 75%, #a855f7 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glowPulse 4s ease-in-out infinite, gradientShift 6s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .cursor-anim {
+            display: inline-block;
+            width: 4px;
+            height: 0.8em;
+            background-color: #38bdf8;
+            vertical-align: middle;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+            border-radius: 2px;
+        }
+
+        header, section, footer {
+            position: relative;
+            z-index: 10;
+        }
+        
+        button, a {
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* ===== All link text -> light blue ===== */
+        a, a * {
+            color: #7dd3fc !important;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        a:hover, a:hover * {
+            color: #bae6fd !important;
+        }
+
+        /* ===== Extra breathing space around paragraphs ===== */
+        section p {
+            margin-bottom: 1.75rem !important;
+        }
+        section p:last-child {
+            margin-bottom: 0 !important;
+        }
+
+        /* ===== Page Loader ===== */
+        #page-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #030712;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        #page-loader.loaded {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .loader-ring {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 3px solid rgba(56, 189, 248, 0.15);
+            border-top-color: #38bdf8;
+            border-right-color: #818cf8;
+            animation: loaderSpin 0.9s linear infinite;
+        }
+        @keyframes loaderSpin {
+            to { transform: rotate(360deg); }
+        }
+        .loader-text {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: #7dd3fc;
+            animation: loaderPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes loaderPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* ===== Scroll reveal animations ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(48px) scale(0.98);
+            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform, opacity;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-left.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(60px);
+            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal-right.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .reveal-stagger.active > * {
+            animation: staggerUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .reveal-stagger.active > *:nth-child(1) { animation-delay: 0.05s; }
+        .reveal-stagger.active > *:nth-child(2) { animation-delay: 0.2s; }
+        .reveal-stagger.active > *:nth-child(3) { animation-delay: 0.35s; }
+        .reveal-stagger > * {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        @keyframes staggerUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Bounce (scroll cue + icons) ===== */
+        @keyframes gentleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+        .bounce-cue {
+            animation: gentleBounce 1.8s ease-in-out infinite;
+        }
+        .bounce-hover:hover i {
+            animation: gentleBounce 0.6s ease-in-out;
+        }
+
+        /* ===== 3D tilt interaction on cards ===== */
+        .tilt-card {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: transform 0.15s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .tilt-card:hover {
+            box-shadow: 0 25px 60px -15px rgba(56, 189, 248, 0.35);
+            border-color: rgba(56, 189, 248, 0.6) !important;
+        }
+
+        /* ===== Modern hover lift for glass cards & buttons ===== */
+        .glass-card, a.bg-sky-600, a.border {
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.35s ease, border-color 0.35s ease;
+        }
+        section a.bg-sky-600:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 15px 35px -10px rgba(14, 165, 233, 0.5);
+        }
+        #contact a.glass-card:hover {
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-sky-500 selection:text-white text-slate-100">
+
+    <!-- Page Loader -->
+    <div id="page-loader">
+        <div class="loader-ring"></div>
+        <span class="loader-text">Loading Uobi.Tech</span>
+    </div>
+
+    <!-- 3D Galaxy Canvas Background -->
+    <div id="canvas-container"></div>
+
+    <!-- Background Space Boxes -->
+    <div class="space-container">
+        <div class="floating-box box-1"></div>
+        <div class="floating-box box-2"></div>
+        <div class="floating-box box-3"></div>
+        <div class="floating-box box-4"></div>
+        <div class="floating-box box-5"></div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-50 backdrop-blur-xl glass-card border-b border-sky-500/20 shadow-sm">
+        <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-center">
+            <span class="title-highlight font-black tracking-wide">Welcome</span>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative z-10 pt-32 pb-32 px-6 text-center flex flex-col items-center justify-center min-h-[85vh]">
+        <div class="max-w-4xl mx-auto float-text">
+            <div class="mb-6">
+                <h1 class="text-5xl sm:text-8xl big-brand uppercase">
+                    Uobi.Tech<span class="cursor-anim"></span>
+                </h1>
+            </div>
+
+            <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-sky-200 mb-6 leading-[1.15]">
+                Engineering the <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-indigo-300">Digital Frontier</span>
+            </h2>
+            <p class="reveal text-slate-300 text-base sm:text-lg mb-10 leading-relaxed max-w-xl mx-auto font-medium">
+                Specializing in cybersecurity solutions, open-source utility tools, and modern software development. Crafted by Ubaid Ur Rehman.
+            </p>
+            <div class="reveal flex flex-wrap justify-center gap-4">
+                <a href="https://github.com/Uobitecnologys" target="_blank" class="bounce-hover bg-sky-600 hover:bg-sky-500 text-white text-sm font-bold px-8 py-4 rounded-xl transition shadow-lg shadow-sky-900/30 flex items-center gap-2.5">
+                    <i class="fa-brands fa-github text-base"></i> Explore GitHub
+                </a>
+                <a href="#contact" class="bg-transparent text-white text-sm font-bold px-8 py-4 rounded-xl hover:bg-slate-800/20 transition shadow-sm border border-sky-500/30">
+                    Get in Touch
+                </a>
+            </div>
+        </div>
+
+        <div class="bounce-cue absolute bottom-8 left-1/2 -translate-x-1/2 text-sky-300/70">
+            <i class="fa-solid fa-chevron-down text-xl"></i>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="relative z-10 py-24 px-6 border-t border-sky-500/20 glass-card">
+        <div class="max-w-4xl mx-auto text-center flex flex-col items-center">
+            <span class="reveal title-highlight block mb-3">Who We Are</span>
+            <h2 class="reveal text-3xl sm:text-4xl font-extrabold text-sky-200 mb-6">Built for Security & Simplicity</h2>
+            <p class="reveal text-slate-300 leading-relaxed mb-6 text-sm sm:text-base font-normal max-w-2xl mx-auto">
+                Uobi Technology is an independent tech initiative based in Pakistan, focused on cybersecurity hurdles, custom software tools, and robust digital solutions. Our objective is bridging complex security challenges with clean, user-friendly utilities built for developers worldwide.
+            </p>
+            
+            <div class="tilt-card reveal w-full max-w-md glass-card p-6 sm:p-8 rounded-2xl shadow-xl mt-6 space-y-4 border border-sky-500/20">
+                <div class="flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl bg-slate-900/50 border border-sky-500/20">
+                    <p class="label-highlight">Location</p>
+                    <p class="font-bold text-sky-200 text-sm">Pakistan (Working Remotely)</p>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl bg-slate-900/50 border border-sky-500/20">
+                    <p class="label-highlight">Open-Source</p>
+                    <p class="font-bold text-sky-200 text-sm">7+ Public Repositories</p>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-1 p-3.5 rounded-xl bg-slate-900/50 border border-sky-500/20">
+                    <p class="label-highlight">Domain</p>
+                    <p class="font-bold text-sky-200 text-sm">Cybersecurity & Web Tech</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Focus Areas Section -->
+    <section id="focus" class="relative z-10 py-24 px-6 max-w-6xl mx-auto text-center">
+        <div class="reveal mb-16 glass-card rounded-2xl p-8 sm:p-10 border border-sky-500/20 max-w-2xl mx-auto">
+            <span class="label-highlight uppercase block mb-2">Capabilities</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-sky-200 mb-3">Core Focus Areas</h2>
+            <p class="text-slate-400 text-sm max-w-md mx-auto font-medium">Click any card below to view the full field summary.</p>
+        </div>
+        
+        <div class="reveal-stagger grid md:grid-cols-3 gap-6">
+            <!-- Focus Card 1 -->
+            <div class="tilt-card glass-card p-8 rounded-2xl text-center cursor-pointer group flex flex-col items-center border border-sky-500/20" onclick="toggleSummary('summary-1', this)">
+                <h3 class="text-lg font-bold text-sky-200 mb-2 group-hover:text-sky-300 transition">Cybersecurity Tools <i class="fa-solid fa-chevron-down text-xs ml-1 opacity-70"></i></h3>
+                <p class="text-slate-300 text-sm leading-relaxed font-normal">
+                    Building network utilities, custom assessment scripts, and security applications.
+                </p>
+                <div id="summary-1" class="hidden mt-4 pt-4 border-t border-sky-500/30 text-center text-xs text-slate-300 leading-relaxed">
+                    <p class="font-semibold text-sky-300 mb-1">Detailed Overview:</p>
+                    Our cybersecurity domain focuses on creating lightweight network scanning scripts, protocol vulnerability assessment utilities, and defensive automation tools.
+                </div>
+            </div>
+
+            <!-- Focus Card 2 -->
+            <div class="tilt-card glass-card p-8 rounded-2xl text-center cursor-pointer group flex flex-col items-center border border-sky-500/20" onclick="toggleSummary('summary-2', this)">
+                <h3 class="text-lg font-bold text-sky-200 mb-2 group-hover:text-sky-300 transition">Open-Source Projects <i class="fa-solid fa-chevron-down text-xs ml-1 opacity-70"></i></h3>
+                <p class="text-slate-300 text-sm leading-relaxed font-normal">
+                    Sharing accessible source codes and utility tools publicly on GitHub.
+                </p>
+                <div id="summary-2" class="hidden mt-4 pt-4 border-t border-sky-500/30 text-center text-xs text-slate-300 leading-relaxed">
+                    <p class="font-semibold text-sky-300 mb-1">Detailed Overview:</p>
+                    We actively contribute to the open-source ecosystem by publishing utility repositories, scripts, and developer toolkits with clean documentation.
+                </div>
+            </div>
+
+            <!-- Focus Card 3 -->
+            <div class="tilt-card glass-card p-8 rounded-2xl text-center cursor-pointer group flex flex-col items-center border border-sky-500/20" onclick="toggleSummary('summary-3', this)">
+                <h3 class="text-lg font-bold text-sky-200 mb-2 group-hover:text-sky-300 transition">Web Engineering <i class="fa-solid fa-chevron-down text-xs ml-1 opacity-70"></i></h3>
+                <p class="text-slate-300 text-sm leading-relaxed font-normal">
+                    Developing modern, performance-driven web interfaces and clean digital experiences.
+                </p>
+                <div id="summary-3" class="hidden mt-4 pt-4 border-t border-sky-500/30 text-center text-xs text-slate-300 leading-relaxed">
+                    <p class="font-semibold text-sky-300 mb-1">Detailed Overview:</p>
+                    Our web engineering solutions combine cutting-edge frontend structures like Tailwind CSS and WebGL animations with robust backend logic.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Banner -->
+    <section id="projects" class="relative z-10 py-16 px-6">
+        <div class="reveal tilt-card max-w-4xl mx-auto glass-card border-sky-500/30 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden flex flex-col items-center">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-sky-200 mb-3">Explore Our Code Repositories</h2>
+            <p class="text-slate-300 text-sm mb-8 max-w-md mx-auto font-medium">
+                Check out active codebases, tool releases, and continuous updates on GitHub.
+            </p>
+            <a href="https://github.com/Uobitecnologys" target="_blank" class="bounce-hover inline-flex items-center gap-2.5 bg-sky-600 text-white font-bold text-sm px-8 py-4 rounded-xl border border-sky-500/30 hover:bg-sky-500 transition shadow-lg">
+                <i class="fa-brands fa-github text-base"></i> Visit GitHub Profile
+            </a>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="relative z-10 py-24 px-6 max-w-4xl mx-auto text-center flex flex-col items-center">
+        <span class="reveal label-highlight uppercase block mb-2">Connect</span>
+        <h2 class="reveal text-2xl sm:text-3xl font-extrabold text-sky-200 mb-3">Get in Touch</h2>
+        <p class="reveal text-slate-300 text-sm mb-12 max-w-sm mx-auto font-medium">Have questions or want to collaborate? Reach out via email or social links.</p>
+        
+        <div class="reveal tilt-card w-full max-w-sm mb-10">
+            <a href="mailto:ubaidurrehman00987@gmail.com" class="glass-card p-5 rounded-xl flex flex-col items-center justify-center gap-1 group border border-sky-500/30 hover:border-sky-400 transition shadow-lg">
+                <p class="text-xs text-slate-300 font-semibold">Email Us</p>
+                <p class="text-xs font-bold text-sky-200">ubaidurrehman00987@gmail.com</p>
+            </a>
+        </div>
+
+        <div class="reveal flex items-center justify-center gap-4 text-sm font-bold text-white pt-4">
+            <a href="https://github.com/Uobitecnologys" target="_blank" class="hover:text-sky-300 transition flex items-center gap-2 text-white">
+                <i class="fa-brands fa-github text-base"></i> GitHub
+            </a>
+            <span class="text-slate-600">|</span>
+            <a href="https://www.instagram.com/uobi.technology" target="_blank" class="hover:text-sky-300 transition flex items-center gap-2 text-white">
+                <i class="fa-brands fa-instagram text-base"></i> Instagram
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-8 border-t border-sky-500/20 text-center text-xs text-slate-400 px-6 glass-card font-medium">
+        <p class="reveal">&copy; 2026 Uobi Technology. Designed & Developed by Ubaid Ur Rehman.</p>
+    </footer>
+    <script>
+        // ===== Page Loader =====
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader');
+            setTimeout(() => {
+                loader.classList.add('loaded');
+            }, 500);
+        });
+
+        // ===== Scroll Reveal Animations =====
+        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-stagger');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // ===== 3D Tilt Interaction on Cards =====
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -6;
+                const rotateY = ((x - centerX) / centerX) * 6;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px) scale(1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0) scale(1)';
+            });
+        });
+
+        function toggleSummary(id, cardElement) {
+            const summaryEl = document.getElementById(id);
+            const isHidden = summaryEl.classList.contains('hidden');
+            
+            if (isHidden) {
+                summaryEl.classList.remove('hidden');
+                cardElement.style.borderColor = 'rgba(56, 189, 248, 0.8)';
+            } else {
+                summaryEl.classList.add('hidden');
+                cardElement.style.borderColor = 'rgba(56, 189, 248, 0.2)';
+            }
+        }
+
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x030712, 0.001);
+
+        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 14, 20);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxDistance = 60;
+        controls.minDistance = 3;
+
+        const parameters = {
+            count: 40000,
+            size: 0.012,
+            radius: 14,
+            branches: 4,
+            spin: 1.2,
+            randomness: 0.5,
+            power: 4,
+            insideColor: '#38bdf8', 
+            outsideColor: '#6366f1' 
+        };
+
+        let geometry = null;
+        let material = null;
+        let points = null;
+
+        const generateGalaxy = () => {
+            if (points) {
+                geometry.dispose();
+                material.dispose();
+                scene.remove(points);
+            }
+
+            geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(parameters.count * 3);
+            const colors = new Float32Array(parameters.count * 3);
+
+            const colorInside = new THREE.Color(parameters.insideColor);
+            const colorOutside = new THREE.Color(parameters.outsideColor);
+
+            for (let i = 0; i < parameters.count; i++) {
+                const i3 = i * 3;
+                const radius = Math.random() * parameters.radius;
+                const spinAngle = radius * parameters.spin;
+                const branchAngle = ((i % parameters.branches) / parameters.branches) * Math.PI * 2;
+
+                const randomX = Math.pow(Math.random(), parameters.power) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                const randomY = Math.pow(Math.random(), parameters.power) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+                const randomZ = Math.pow(Math.random(), parameters.power) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+
+                positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+                positions[i3 + 1] = randomY;
+                positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+                const mixedColor = colorInside.clone();
+                mixedColor.lerp(colorOutside, radius / parameters.radius);
+
+                colors[i3] = mixedColor.r;
+                colors[i3 + 1] = mixedColor.g;
+                colors[i3 + 2] = mixedColor.b;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            material = new THREE.PointsMaterial({
+                size: parameters.size,
+                sizeAttenuation: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+                vertexColors: true
+            });
+
+            points = new THREE.Points(geometry, material);
+            scene.add(points);
+        };
+
+        generateGalaxy();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        });
+
+        const clock = new THREE.Clock();
+
+        let targetScrollY = window.scrollY;
+        let currentScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            targetScrollY = window.scrollY;
+        });
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Smoothly ease toward the latest scroll position
+            currentScrollY += (targetScrollY - currentScrollY) * 0.05;
+
+            if (points) {
+                points.rotation.y = elapsedTime * 0.04 + currentScrollY * 0.0006;
+                points.rotation.x = currentScrollY * 0.0003;
+                points.position.y = currentScrollY * 0.015;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        };
+
+        animate();
+    </script>
+</body>
+</html>
