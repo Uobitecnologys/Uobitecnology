@@ -81,6 +81,38 @@
             pointer-events: none;
         }
 
+        /* ===== Cyber grid floor + scanline atmosphere ===== */
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+            background-size: 64px 64px;
+            mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, black 0%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, black 0%, transparent 70%);
+        }
+
+        .scan-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            background: linear-gradient(180deg, transparent 0%, rgba(56, 189, 248, 0.06) 50%, transparent 100%);
+            height: 220px;
+            animation: scanSweep 7s linear infinite;
+            opacity: 0.7;
+        }
+        @keyframes scanSweep {
+            0% { transform: translateY(-220px); }
+            100% { transform: translateY(100vh); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .scan-overlay { animation: none; display: none; }
+        }
+
         .floating-box {
             position: absolute;
             background: linear-gradient(135deg, rgba(56, 189, 248, 0.05), rgba(99, 102, 241, 0.1));
@@ -215,6 +247,23 @@
             text-transform: uppercase;
             color: #7dd3fc;
             animation: loaderPulse 1.4s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+        }
+        .loader-track {
+            width: 180px;
+            height: 3px;
+            border-radius: 2px;
+            background: rgba(56, 189, 248, 0.15);
+            overflow: hidden;
+        }
+        .loader-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            border-radius: 2px;
+            transition: width 0.2s ease-out;
         }
         @keyframes loaderPulse {
             0%, 100% { opacity: 0.4; }
@@ -281,13 +330,37 @@
 
         /* ===== 3D tilt interaction on cards ===== */
         .tilt-card {
+            --mx: 50%;
+            --my: 50%;
+            position: relative;
             transform-style: preserve-3d;
             perspective: 1000px;
             transition: transform 0.15s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+            isolation: isolate;
         }
         .tilt-card:hover {
             box-shadow: 0 25px 60px -15px rgba(56, 189, 248, 0.35);
             border-color: rgba(56, 189, 248, 0.6) !important;
+        }
+        /* Pointer-tracked glare sheen, layered above card content */
+        .tilt-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(circle 220px at var(--mx) var(--my), rgba(125, 211, 252, 0.22), transparent 65%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 1;
+            mix-blend-mode: screen;
+        }
+        .tilt-card:hover::after {
+            opacity: 1;
+        }
+        @media (hover: none), (prefers-reduced-motion: reduce) {
+            .tilt-card { transition: none; }
+            .tilt-card::after { display: none; }
         }
 
         /* ===== Modern hover lift for glass cards & buttons ===== */
@@ -309,11 +382,16 @@
     <!-- Page Loader -->
     <div id="page-loader">
         <div class="loader-ring"></div>
-        <span class="loader-text">Loading Uobi.Tech</span>
+        <span class="loader-text">Decrypting <span id="loader-pct">0%</span></span>
+        <div class="loader-track"><div class="loader-fill" id="loader-fill"></div></div>
     </div>
 
     <!-- 3D Galaxy Canvas Background -->
     <div id="canvas-container"></div>
+
+    <!-- Cyber grid + scanline atmosphere -->
+    <div class="grid-overlay"></div>
+    <div class="scan-overlay"></div>
 
     <!-- Background Space Boxes -->
     <div class="space-container">
@@ -334,14 +412,14 @@
     <!-- Hero Section -->
     <section class="relative z-10 pt-32 pb-32 px-6 text-center flex flex-col items-center justify-center min-h-[85vh]">
         <div class="max-w-4xl mx-auto float-text">
-            <div class="mb-6">
+            <div class="mb-4">
                 <h1 class="text-5xl sm:text-8xl big-brand uppercase">
-                    Uobi.Tech<span class="cursor-anim"></span>
+                    Uobi.Tech
                 </h1>
             </div>
 
-            <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-sky-200 mb-6 leading-[1.15]">
-                Engineering the <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-indigo-300">Digital Frontier</span>
+            <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-sky-200 mb-6 leading-[1.15] min-h-[1.4em] flex items-center justify-center font-mono">
+                <span id="typed-tagline"></span><span class="cursor-anim"></span>
             </h2>
             <p class="reveal text-slate-300 text-base sm:text-lg mb-10 leading-relaxed max-w-xl mx-auto font-medium">
                 Specializing in cybersecurity solutions, open-source utility tools, and modern software development. Crafted by Ubaid Ur Rehman.
@@ -478,12 +556,64 @@
         <p>&copy; 2026 Uobi Technology. Designed & Developed by Ubaid Ur Rehman.</p>
     </footer>
     <script>
-        // ===== Page Loader =====
-        window.addEventListener('load', () => {
+        // ===== Page Loader (simulated decrypt progress) =====
+        (() => {
             const loader = document.getElementById('page-loader');
-            setTimeout(() => {
-                loader.classList.add('loaded');
-            }, 500);
+            const fill = document.getElementById('loader-fill');
+            const pct = document.getElementById('loader-pct');
+            let current = 0;
+            let pageLoaded = false;
+            const tick = () => {
+                const ceiling = pageLoaded ? 100 : 90;
+                current += (ceiling - current) * 0.08 + 0.3;
+                current = Math.min(current, 100);
+                fill.style.width = current + '%';
+                pct.textContent = Math.round(current) + '%';
+                if (current < 100) requestAnimationFrame(tick);
+                else setTimeout(() => loader.classList.add('loaded'), 250);
+            };
+            requestAnimationFrame(tick);
+            window.addEventListener('load', () => { pageLoaded = true; });
+        })();
+
+        // ===== Terminal-style typing tagline =====
+        (() => {
+            const el = document.getElementById('typed-tagline');
+            if (!el) return;
+            const phrases = ['Engineering the Digital Frontier', 'Cybersecurity, Distilled', 'Open-Source by Default'];
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduceMotion) { el.textContent = phrases[0]; return; }
+            let phraseIndex = 0, charIndex = 0, deleting = false;
+            const step = () => {
+                const phrase = phrases[phraseIndex];
+                if (!deleting) {
+                    charIndex++;
+                    el.textContent = phrase.slice(0, charIndex);
+                    if (charIndex === phrase.length) {
+                        deleting = true;
+                        setTimeout(step, 1800);
+                        return;
+                    }
+                } else {
+                    charIndex--;
+                    el.textContent = phrase.slice(0, charIndex);
+                    if (charIndex === 0) {
+                        deleting = false;
+                        phraseIndex = (phraseIndex + 1) % phrases.length;
+                    }
+                }
+                setTimeout(step, deleting ? 28 : 48);
+            };
+            step();
+        })();
+
+        // ===== Pointer-tracked glare on tilt cards =====
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                card.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%');
+                card.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
+            });
         });
 
         // ===== Scroll Reveal Animations =====
@@ -615,6 +745,70 @@
 
         generateGalaxy();
 
+        // ===== Cyber network-graph layer (nodes + nearest-neighbor edges) =====
+        const networkGroup = new THREE.Group();
+        scene.add(networkGroup);
+        {
+            const nodeCount = 90;
+            const spread = 11;
+            const nodePositions = [];
+            const nodeGeo = new THREE.BufferGeometry();
+            const nodeArr = new Float32Array(nodeCount * 3);
+            for (let i = 0; i < nodeCount; i++) {
+                const p = new THREE.Vector3(
+                    (Math.random() - 0.5) * spread * 2,
+                    (Math.random() - 0.5) * spread * 1.2 + 4,
+                    (Math.random() - 0.5) * spread * 2
+                );
+                nodePositions.push(p);
+                nodeArr[i * 3] = p.x;
+                nodeArr[i * 3 + 1] = p.y;
+                nodeArr[i * 3 + 2] = p.z;
+            }
+            nodeGeo.setAttribute('position', new THREE.BufferAttribute(nodeArr, 3));
+            const nodeMat = new THREE.PointsMaterial({
+                size: 0.14,
+                color: 0x7dd3fc,
+                transparent: true,
+                opacity: 0.85,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+            networkGroup.add(new THREE.Points(nodeGeo, nodeMat));
+
+            // Connect each node to its nearest neighbors within a threshold distance
+            const linkThreshold = 4.2;
+            const linePositions = [];
+            for (let i = 0; i < nodePositions.length; i++) {
+                for (let j = i + 1; j < nodePositions.length; j++) {
+                    const d = nodePositions[i].distanceTo(nodePositions[j]);
+                    if (d < linkThreshold) {
+                        linePositions.push(
+                            nodePositions[i].x, nodePositions[i].y, nodePositions[i].z,
+                            nodePositions[j].x, nodePositions[j].y, nodePositions[j].z
+                        );
+                    }
+                }
+            }
+            const lineGeo = new THREE.BufferGeometry();
+            lineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(linePositions), 3));
+            const lineMat = new THREE.LineBasicMaterial({
+                color: 0x38bdf8,
+                transparent: true,
+                opacity: 0.12,
+                blending: THREE.AdditiveBlending
+            });
+            networkGroup.add(new THREE.LineSegments(lineGeo, lineMat));
+        }
+
+        // ===== Mouse parallax (subtle camera drift, independent of OrbitControls drag) =====
+        const pointerTarget = { x: 0, y: 0 };
+        const pointerCurrent = { x: 0, y: 0 };
+        window.addEventListener('pointermove', (e) => {
+            pointerTarget.x = (e.clientX / window.innerWidth - 0.5) * 2;
+            pointerTarget.y = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -637,11 +831,20 @@
             // Smoothly ease toward the latest scroll position
             currentScrollY += (targetScrollY - currentScrollY) * 0.05;
 
+            pointerCurrent.x += (pointerTarget.x - pointerCurrent.x) * 0.04;
+            pointerCurrent.y += (pointerTarget.y - pointerCurrent.y) * 0.04;
+
             if (points) {
-                points.rotation.y = elapsedTime * 0.04 + currentScrollY * 0.0006;
-                points.rotation.x = currentScrollY * 0.0003;
+                points.rotation.y = elapsedTime * 0.04 + currentScrollY * 0.0006 + pointerCurrent.x * 0.06;
+                points.rotation.x = currentScrollY * 0.0003 + pointerCurrent.y * 0.03;
                 points.position.y = currentScrollY * 0.015;
             }
+
+            networkGroup.rotation.y = -elapsedTime * 0.025 + currentScrollY * 0.0004 + pointerCurrent.x * 0.1;
+            networkGroup.rotation.x = pointerCurrent.y * 0.04;
+            networkGroup.position.y = 6 - currentScrollY * 0.012;
+            const pulse = 0.08 + Math.sin(elapsedTime * 0.6) * 0.05;
+            networkGroup.children[1].material.opacity = Math.max(pulse, 0.02);
 
             controls.update();
             renderer.render(scene, camera);
